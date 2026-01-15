@@ -1867,7 +1867,7 @@
     "ruleId": "",
     "ruleTitle": "Avoid Hardcoded Secrets",
     "type": "bad",
-    "code": "import requests\n\nheaders = {\"Authorization\": \"token ghp_emmtytndiqky5a98w0s98w36vfhiz6f7ed4c\"}\nresponse = requests.get(\"https://api.github.com/user\", headers=headers)",
+    "code": "import requests\n\nheaders = {\"Authorization\": \"token ghp_emmtytndiqky5a98w0s98w36fakekey\"}\nresponse = requests.get(\"https://api.github.com/user\", headers=headers)",
     "language": "python",
     "description": "Python - hardcoded GitHub token"
   },

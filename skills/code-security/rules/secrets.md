@@ -154,7 +154,7 @@ const client = stripe(process.env.STRIPE_SECRET_KEY);
 ```python
 import requests
 
-headers = {"Authorization": "token ghp_emmtytndiqky5a98w0s98w36vfhiz6f7ed4c"}
+headers = {"Authorization": "token ghp_emmtytndiqky5a98w0s98w36fakekey"}
 response = requests.get("https://api.github.com/user", headers=headers)
 ```
 
