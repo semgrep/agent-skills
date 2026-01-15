@@ -1,7 +1,7 @@
 {
-  "name": "code-security-build",
+  "name": "skill-build",
   "version": "0.1.0",
-  "description": "Build tooling for Code Security skill",
+  "description": "Generic build tooling for agent skills with rules",
   "type": "module",
   "scripts": {
     "build": "pnpm build-agents && pnpm extract-tests",
@@ -15,7 +15,8 @@
     "security",
     "guidelines",
     "llm",
-    "agents"
+    "agents",
+    "skills"
   ],
   "license": "MIT",
   "devDependencies": {

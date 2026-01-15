@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 /**
  * Validate rule files follow the correct structure
+ *
+ * Usage: tsx src/validate.ts [skill-name]
+ * If no skill name provided, defaults to 'code-security'
  */
 
 import { readdir } from 'fs/promises'
 import { join } from 'path'
 import { Rule } from './types.js'
 import { parseRuleFile } from './parser.js'
-import { RULES_DIR } from './config.js'
+import { RULES_DIR, SKILL_NAME, validateSkillExists } from './config.js'
 
 interface ValidationError {
   file: string
@@ -51,14 +54,18 @@ function validateRule(rule: Rule, file: string): ValidationResult {
     const hasBad = codeExamples.some(e =>
       e.label.toLowerCase().includes('incorrect') ||
       e.label.toLowerCase().includes('wrong') ||
-      e.label.toLowerCase().includes('bad')
+      e.label.toLowerCase().includes('bad') ||
+      e.label.toLowerCase().includes('vulnerable') ||
+      e.label.toLowerCase().includes('insecure')
     )
     const hasGood = codeExamples.some(e =>
       e.label.toLowerCase().includes('correct') ||
       e.label.toLowerCase().includes('good') ||
       e.label.toLowerCase().includes('usage') ||
       e.label.toLowerCase().includes('implementation') ||
-      e.label.toLowerCase().includes('example')
+      e.label.toLowerCase().includes('example') ||
+      e.label.toLowerCase().includes('secure') ||
+      e.label.toLowerCase().includes('safe')
     )
 
     if (codeExamples.length === 0) {
@@ -90,7 +97,10 @@ function validateRule(rule: Rule, file: string): ValidationResult {
  */
 async function validate() {
   try {
-    console.log('Validating rule files...')
+    // Validate skill exists
+    validateSkillExists()
+
+    console.log(`Validating rule files for skill: ${SKILL_NAME}`)
     console.log(`Rules directory: ${RULES_DIR}`)
 
     const files = await readdir(RULES_DIR)
@@ -130,7 +140,7 @@ async function validate() {
       })
       process.exit(1)
     } else {
-      console.log(`\n✓ All ${ruleFiles.length} rule files are valid`)
+      console.log(`\n✓ ${SKILL_NAME}: All ${ruleFiles.length} rule files are valid`)
       if (allWarnings.length > 0) {
         console.log(`  (${allWarnings.length} warnings - consider adding missing optional fields)`)
       }

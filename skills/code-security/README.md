@@ -55,10 +55,10 @@ make             # All of the above
 
 Or from the build package:
 ```bash
-cd packages/code-security-build
+cd packages/skill-build
 pnpm install
-pnpm validate    # Validate rule files
-pnpm build       # Build AGENTS.md and test-cases.json
+pnpm validate code-security    # Validate rule files
+pnpm build-agents code-security  # Build AGENTS.md
 ```
 
 ## Creating a New Rule

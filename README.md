@@ -51,6 +51,37 @@ Comprehensive code security guidelines from Semgrep Engineering covering OWASP T
 
 **Languages:** Python, JavaScript/TypeScript, Java, Go, Ruby, PHP, C/C++, C#, Scala, Kotlin, Rust, HCL (Terraform), YAML (Kubernetes)
 
+---
+
+### llm-security
+
+Security guidelines for LLM applications based on the OWASP Top 10 for Large Language Model Applications 2025.
+
+**Use when:**
+- Building LLM-powered applications
+- Implementing RAG systems
+- Securing AI/ML pipelines
+- Reviewing code that interacts with language models
+
+**Categories covered:**
+
+| Impact | Category | Description |
+|--------|----------|-------------|
+| **Critical** | Prompt Injection | Input validation, content segregation, output filtering |
+| **Critical** | Sensitive Information Disclosure | PII detection, permission-aware RAG |
+| **Critical** | Supply Chain | Model verification, safetensors, ML-BOM |
+| **Critical** | Data and Model Poisoning | Training data validation, anomaly detection |
+| **Critical** | Improper Output Handling | Context-aware encoding, parameterized queries |
+| **High** | Excessive Agency | Least privilege, human-in-the-loop |
+| **High** | System Prompt Leakage | External guardrails, no secrets in prompts |
+| **High** | Vector and Embedding Weaknesses | Permission-aware retrieval, tenant isolation |
+| **High** | Misinformation | RAG, fact verification, confidence scoring |
+| **High** | Unbounded Consumption | Rate limiting, budget controls |
+
+**Frameworks:** OWASP LLM Top 10, MITRE ATLAS, NIST AI RMF
+
+---
+
 ## Installation
 
 ```bash
@@ -65,15 +96,37 @@ Skills are automatically available once installed. The agent will use them when 
 ```
 Review this React component for security issues
 ```
+```
+Help me implement input validation for my LLM chat endpoint
+```
 
+## Development
+
+### Building Skills
+
+```bash
+make install     # Install dependencies
+make validate    # Validate all skills
+make build       # Build AGENTS.md for all skills
+make zip         # Create distribution packages
+make             # All of the above
+```
+
+### Single Skill Operations
+
+```bash
+make validate-skill SKILL=code-security
+make build-skill SKILL=llm-security
+```
 
 ## Skill Structure
 
 Each skill contains:
 - `SKILL.md` - Instructions for the agent
+- `rules/` - Individual rule files (for skills with rules)
 - `scripts/` - Helper scripts for automation (optional)
 - `references/` - Supporting documentation (optional)
 
 ## Acknowledgments
 
-Originally created by [@DrewDennison](https://x.com/drewdennison) at [Semgrep](https://semgrep.dev). This work was heavily inspired by Vercel's [React Best Practices](https://vercel.com/blog/introducing-react-best-practices)
+Originally created by [@DrewDennison](https://x.com/drewdennison) at [Semgrep](https://semgrep.dev). This work was heavily inspired by Vercel's [React Best Practices](https://vercel.com/blog/introducing-react-best-practices).

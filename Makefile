@@ -9,17 +9,35 @@ all: validate build zip
 # Install dependencies
 install:
 	@echo "Installing dependencies..."
-	cd packages/code-security-build && pnpm install
+	cd packages/skill-build && pnpm install
 
-# Validate all rule files
+# Validate all skills with rules directories
 validate:
-	@echo "Validating rule files..."
-	cd packages/code-security-build && pnpm validate
+	@echo "Validating all skills..."
+	@for skill_dir in skills/*/; do \
+		skill_name=$$(basename "$$skill_dir"); \
+		if [ -d "$$skill_dir/rules" ]; then \
+			echo ""; \
+			echo "Validating $$skill_name..."; \
+			cd packages/skill-build && pnpm validate "$$skill_name" && cd ../..; \
+		fi \
+	done
+	@echo ""
+	@echo "Done validating all skills!"
 
-# Build the skill (runs build-agents and extract-tests)
+# Build all skills with rules directories
 build:
-	@echo "Building skills..."
-	cd packages/code-security-build && pnpm build
+	@echo "Building all skills..."
+	@for skill_dir in skills/*/; do \
+		skill_name=$$(basename "$$skill_dir"); \
+		if [ -d "$$skill_dir/rules" ]; then \
+			echo ""; \
+			echo "Building $$skill_name..."; \
+			cd packages/skill-build && pnpm build-agents "$$skill_name" && pnpm extract-tests "$$skill_name" && cd ../..; \
+		fi \
+	done
+	@echo ""
+	@echo "Done building all skills!"
 
 # Create zip files for all skills
 zip:
@@ -40,6 +58,7 @@ zip:
 clean:
 	@echo "Cleaning generated files..."
 	rm -f skills/*.zip
+	rm -f packages/skill-build/test-cases-*.json
 	@echo "Done!"
 
 # Development workflow: validate and build
@@ -51,17 +70,38 @@ release: validate build zip
 	@echo "Release complete! Zip files created:"
 	@ls -la skills/*.zip 2>/dev/null || echo "  No zip files found"
 
+# Validate a single skill: make validate-skill SKILL=code-security
+validate-skill:
+ifndef SKILL
+	$(error SKILL is required. Usage: make validate-skill SKILL=code-security)
+endif
+	@echo "Validating $(SKILL)..."
+	cd packages/skill-build && pnpm validate "$(SKILL)"
+
+# Build a single skill: make build-skill SKILL=code-security
+build-skill:
+ifndef SKILL
+	$(error SKILL is required. Usage: make build-skill SKILL=code-security)
+endif
+	@echo "Building $(SKILL)..."
+	cd packages/skill-build && pnpm build-agents "$(SKILL)" && pnpm extract-tests "$(SKILL)"
+
 # Show help
 help:
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Targets:"
-	@echo "  all       - Validate, build, and create zip packages (default)"
-	@echo "  install   - Install pnpm dependencies"
-	@echo "  validate  - Validate all rule files"
-	@echo "  build     - Build the skill files"
-	@echo "  zip       - Create zip packages for all skills"
-	@echo "  clean     - Remove generated zip files"
-	@echo "  dev       - Validate and build (no zip)"
-	@echo "  release   - Full release: validate, build, and zip"
-	@echo "  help      - Show this help message"
+	@echo "  all            - Validate, build, and create zip packages (default)"
+	@echo "  install        - Install pnpm dependencies"
+	@echo "  validate       - Validate all skills with rules directories"
+	@echo "  build          - Build AGENTS.md for all skills with rules"
+	@echo "  zip            - Create zip packages for all skills"
+	@echo "  clean          - Remove generated files"
+	@echo "  dev            - Validate and build (no zip)"
+	@echo "  release        - Full release: validate, build, and zip"
+	@echo ""
+	@echo "Single skill targets:"
+	@echo "  validate-skill - Validate one skill: make validate-skill SKILL=name"
+	@echo "  build-skill    - Build one skill: make build-skill SKILL=name"
+	@echo ""
+	@echo "  help           - Show this help message"

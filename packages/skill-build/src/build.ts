@@ -1,14 +1,27 @@
 #!/usr/bin/env node
 /**
  * Build script to compile individual rule files into AGENTS.md
+ *
+ * Usage: tsx src/build.ts [skill-name]
+ * If no skill name provided, defaults to 'code-security'
  */
 
 import { readdir, readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { Rule, Section, GuidelinesDocument, ImpactLevel } from './types.js'
 import { parseRuleFile, RuleFile } from './parser.js'
-import { RULES_DIR, METADATA_FILE, OUTPUT_FILE } from './config.js'
+import { RULES_DIR, METADATA_FILE, OUTPUT_FILE, SKILL_NAME, validateSkillExists } from './config.js'
 import { parseSectionsFile } from './sections.js'
+
+/**
+ * Convert skill name to title case for display
+ */
+function skillNameToTitle(skillName: string): string {
+  return skillName
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
 
 /**
  * Generate markdown from rules
@@ -21,9 +34,11 @@ function generateMarkdown(
     date: string
     abstract: string
     references?: string[]
-  }
+  },
+  skillName: string
 ): string {
-  let md = `# Code Security\n\n`
+  const title = skillNameToTitle(skillName)
+  let md = `# ${title}\n\n`
   md += `**Version ${metadata.version}**  \n`
   md += `${metadata.organization}  \n`
   md += `${metadata.date}\n\n`
@@ -117,7 +132,10 @@ function generateMarkdown(
  */
 async function build() {
   try {
-    console.log('Building AGENTS.md from rules...')
+    // Validate skill exists
+    validateSkillExists()
+
+    console.log(`Building AGENTS.md for skill: ${SKILL_NAME}`)
     console.log(`Rules directory: ${RULES_DIR}`)
     console.log(`Output file: ${OUTPUT_FILE}`)
 
@@ -198,26 +216,27 @@ async function build() {
       const metadataContent = await readFile(METADATA_FILE, 'utf-8')
       metadata = JSON.parse(metadataContent)
     } catch {
+      // Generate default metadata based on skill name
+      const title = skillNameToTitle(SKILL_NAME)
       metadata = {
         version: '1.0',
-        organization: 'Semgrep Engineering',
+        organization: '',
         date: new Date().toLocaleDateString('en-US', {
           month: 'long',
           year: 'numeric',
         }),
-        abstract:
-          'Code security guide for identifying, preventing, and mitigating security vulnerabilities in codebases, ordered by impact.',
+        abstract: `${title} guidelines for identifying, preventing, and mitigating issues, ordered by impact.`,
       }
     }
 
     // Generate markdown
-    const markdown = generateMarkdown(sections, metadata)
+    const markdown = generateMarkdown(sections, metadata, SKILL_NAME)
 
     // Write output
     await writeFile(OUTPUT_FILE, markdown, 'utf-8')
 
     console.log(
-      `✓ Built AGENTS.md with ${sections.length} sections and ${ruleData.length} rules`
+      `✓ ${SKILL_NAME}: Built AGENTS.md with ${sections.length} sections and ${ruleData.length} rules`
     )
   } catch (error) {
     console.error('Build failed:', error)

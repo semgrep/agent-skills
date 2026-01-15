@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 /**
  * Extract test cases from rules for LLM evaluation
+ *
+ * Usage: tsx src/extract-tests.ts [skill-name]
+ * If no skill name provided, defaults to 'code-security'
  */
 
 import { readdir, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { Rule, TestCase } from './types.js'
 import { parseRuleFile } from './parser.js'
-import { RULES_DIR, TEST_CASES_FILE } from './config.js'
+import { RULES_DIR, TEST_CASES_FILE, SKILL_NAME, validateSkillExists } from './config.js'
 
 /**
  * Extract test cases from a rule
@@ -16,11 +19,15 @@ function extractTestCases(rule: Rule): TestCase[] {
   const testCases: TestCase[] = []
   
   rule.examples.forEach((example, index) => {
-    const isBad = example.label.toLowerCase().includes('incorrect') || 
+    const isBad = example.label.toLowerCase().includes('incorrect') ||
                   example.label.toLowerCase().includes('wrong') ||
-                  example.label.toLowerCase().includes('bad')
+                  example.label.toLowerCase().includes('bad') ||
+                  example.label.toLowerCase().includes('vulnerable') ||
+                  example.label.toLowerCase().includes('insecure')
     const isGood = example.label.toLowerCase().includes('correct') ||
-                   example.label.toLowerCase().includes('good')
+                   example.label.toLowerCase().includes('good') ||
+                   example.label.toLowerCase().includes('secure') ||
+                   example.label.toLowerCase().includes('safe')
     
     if (isBad || isGood) {
       testCases.push({
@@ -42,7 +49,10 @@ function extractTestCases(rule: Rule): TestCase[] {
  */
 async function extractTests() {
   try {
-    console.log('Extracting test cases from rules...')
+    // Validate skill exists
+    validateSkillExists()
+
+    console.log(`Extracting test cases for skill: ${SKILL_NAME}`)
     console.log(`Rules directory: ${RULES_DIR}`)
     console.log(`Output file: ${TEST_CASES_FILE}`)
     
@@ -65,7 +75,7 @@ async function extractTests() {
     // Write test cases as JSON
     await writeFile(TEST_CASES_FILE, JSON.stringify(allTestCases, null, 2), 'utf-8')
     
-    console.log(`✓ Extracted ${allTestCases.length} test cases to ${TEST_CASES_FILE}`)
+    console.log(`✓ ${SKILL_NAME}: Extracted ${allTestCases.length} test cases to ${TEST_CASES_FILE}`)
     console.log(`  - Bad examples: ${allTestCases.filter(tc => tc.type === 'bad').length}`)
     console.log(`  - Good examples: ${allTestCases.filter(tc => tc.type === 'good').length}`)
   } catch (error) {
