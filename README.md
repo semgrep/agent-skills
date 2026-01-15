@@ -6,7 +6,7 @@ Skills follow the [Agent Skills](https://agentskills.io/) format.
 
 ## Available Skills
 
-### code-security-practices
+### code-security
 
 Code security guidelines from Semgrep Engineering. 
 

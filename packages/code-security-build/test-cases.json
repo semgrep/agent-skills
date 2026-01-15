@@ -1,0 +1,34 @@
+[
+  {
+    "ruleId": "",
+    "ruleTitle": "Prevent SQL Injection",
+    "type": "bad",
+    "code": "export async function GET(request: Request) {\n  const session = await auth()\n  const config = await fetchConfig()\n  const data = await fetchData(session.user.id)\n  return Response.json({ data, config })\n}",
+    "language": "typescript",
+    "description": "Incorrect example for Prevent SQL Injection"
+  },
+  {
+    "ruleId": "",
+    "ruleTitle": "Prevent SQL Injection",
+    "type": "good",
+    "code": "export async function GET(request: Request) {\n  const sessionPromise = auth()\n  const configPromise = fetchConfig()\n  const session = await sessionPromise\n  const [config, data] = await Promise.all([\n    configPromise,\n    fetchData(session.user.id)\n  ])\n  return Response.json({ data, config })\n}",
+    "language": "typescript",
+    "description": "Correct example for Prevent SQL Injection"
+  },
+  {
+    "ruleId": "",
+    "ruleTitle": "Prevent SQL Injection",
+    "type": "bad",
+    "code": "// Vulnerable: concatenates user input directly into SQL\nimport { Pool } from 'pg'\nconst pool = new Pool()\n\nexport async function handler(req: any, res: any) {\n  const userId = req.query.id // attacker can supply \"1 OR 1=1\"\n  const sql = `SELECT id, username, email FROM users WHERE id = ${userId}`\n  const { rows } = await pool.query(sql)\n  res.json(rows)\n}",
+    "language": "typescript",
+    "description": "vulnerable SQL - Node.js / TypeScript"
+  },
+  {
+    "ruleId": "",
+    "ruleTitle": "Prevent SQL Injection",
+    "type": "good",
+    "code": "// Safe: use parameterized queries to avoid SQL injection\nimport { Pool } from 'pg'\nconst pool = new Pool()\n\nexport async function handler(req: any, res: any) {\n  const userId = req.query.id\n  const sql = 'SELECT id, username, email FROM users WHERE id = $1'\n  const { rows } = await pool.query(sql, [userId])\n  res.json(rows)\n}",
+    "language": "typescript",
+    "description": "parameterized query - Node.js / TypeScript"
+  }
+]
