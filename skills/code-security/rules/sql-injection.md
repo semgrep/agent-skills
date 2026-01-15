@@ -8,32 +8,6 @@ tags: sql
 ## Prevent SQL Injection
 
 Never concatenate or use format strings to execute sql, always use parameterized queries.
-
-**Incorrect:**
-
-```typescript
-export async function GET(request: Request) {
-  const session = await auth()
-  const config = await fetchConfig()
-  const data = await fetchData(session.user.id)
-  return Response.json({ data, config })
-}
-```
-
-**Correct:**
-
-```typescript
-export async function GET(request: Request) {
-  const sessionPromise = auth()
-  const configPromise = fetchConfig()
-  const session = await sessionPromise
-  const [config, data] = await Promise.all([
-    configPromise,
-    fetchData(session.user.id)
-  ])
-  return Response.json({ data, config })
-}
-```
  
 **Incorrect (vulnerable SQL - Node.js / TypeScript):**
 
