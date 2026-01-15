@@ -66,7 +66,7 @@ pnpm build       # Build AGENTS.md and test-cases.json
 1. Copy `rules/_template.md` to `rules/{category}.md`
 2. Follow this structure:
 
-```markdown
+````markdown
 ---
 title: Rule Title
 impact: HIGH
@@ -88,7 +88,7 @@ Brief explanation of the vulnerability.
 ```python
 # Secure code
 ```
-```
+````
 
 3. Run `make validate` to check formatting
 4. Run `make` to rebuild everything
