@@ -4,6 +4,12 @@ A collection of skills for AI coding agents. Skills are packaged instructions an
 
 Skills follow the [Agent Skills](https://agentskills.io/) format.
 
+## Installation
+
+```bash
+npx skills add semgrep/agent-skills
+```
+
 ## Available Skills
 
 ### code-security
@@ -82,11 +88,6 @@ Security guidelines for LLM applications based on the OWASP Top 10 for Large Lan
 
 ---
 
-## Installation
-
-```bash
-npx add-skill semgrep/agent-skills
-```
 
 ## Usage
 
